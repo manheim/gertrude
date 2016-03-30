@@ -1,7 +1,5 @@
 class ItemServer < Sinatra::Base
 
-  set :port, 8080
-
   items_list = ItemsList.new
   ARGV[1].nil? ? (raise 'yml file required to start gertrude') : items_list.load_items!(ARGV[1])
 
