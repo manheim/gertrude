@@ -1,9 +1,6 @@
 class ItemServer < Sinatra::Base
 
   set :port, 8080
-  set :show_exceptions, false
-  set :logging, false
- # Process.daemon
 
   items_list = ItemsList.new
   items_list.load_items!(ARGV[1])
@@ -13,7 +10,7 @@ class ItemServer < Sinatra::Base
   end
 
   error ::ItemError::NoReservedItems do
-    halt 422, "No items currently reserved"
+    halt 422, 'No items currently reserved'
   end
 
   error ::ItemError::InvalidItem do |item|
@@ -41,9 +38,6 @@ class ItemServer < Sinatra::Base
     "Items released: #{items_list.release_all_items}"
   end
 
-  get '/stop_service' do
-    system "kill -9 #{Process.pid}"
-  end
 end
 
 

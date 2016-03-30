@@ -1,10 +1,22 @@
 #!/usr/bin/env ruby
 
 require "gertrude"
-require "pry"
+require "optparse"
 
-command = ARGV[0]
+options = {}
 
-if command.eql? "start"
-  ItemServer.run!
+OptionParser.new do |opts|
+  opts.banner = "Usage: example.rb [options]"
+
+  opts.on("-p", "--port [PORT]", Integer, "Assign server port") do |p|
+    options[:port] = p
+  end
+
+  opts.on("-e", "--environment [ENV]", String, "Set Sinatra environment") do |env|
+    options[:environment] = env
+  end
+end.parse!
+
+if ARGV[0].eql? "start"
+  ItemServer.run!(options)
 end
