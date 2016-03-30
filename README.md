@@ -11,7 +11,7 @@ requester releases it back to the service. Check your stuff back in to Gertrude.
 How do I use this?
 ------------------
 
- - Clone the repo.
+ - Install the gem.
  - Define your items in a yaml file, by type.
  - Start the service, using your created yaml file.
  - Request items from the service.
@@ -67,9 +67,9 @@ Alternately, you can replace the "all_items.yml" file in the repo with your yaml
 Clone the repo
 --------------
 
-Clone the repo.
+Install the gem
 ```ruby
-git clone git@whatever_to_get_to_this_repo.git
+$gem install gertrude
 ```
 
 Start service, using created yaml file
@@ -77,7 +77,7 @@ Start service, using created yaml file
 
 Start the service. In this example, we use rack:
 ```ruby
-$rackup path/to/yml?
+$gertrude start path/to/yml
 ```
 
 Request items from the service
