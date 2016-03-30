@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require "gertrude"
 require "optparse"
 
 options = {}
@@ -8,14 +7,25 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: example.rb [options]"
 
-  opts.on("-p", "--port [PORT]", Integer, "Assign server port") do |p|
+  opts.on("-p", "--port [PORT]", Integer, "Assign server port (Default is 4567)") do |p|
     options[:port] = p
   end
 
-  opts.on("-e", "--environment [ENV]", String, "Set Sinatra environment") do |env|
+  opts.on("-e", "--environment [ENV]", String, "Set Sinatra environment (Default is development)") do |env|
     options[:environment] = env
   end
+
+  opts.on("-o", "--host [HOST]", String, "Set the host address (Default is 0.0.0.0)") do |host|
+    options[:host] = host
+  end
+
+  opts.on("-h", "--help", "Display this help") do
+    puts opts
+    exit
+  end
 end.parse!
+
+require "gertrude"
 
 if ARGV[0].eql? "start"
   ItemServer.run!(options)
