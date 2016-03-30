@@ -1,0 +1,19 @@
+---
+admin:
+  danny7:
+    user_name: 'danny7'
+    rep_id: '100014624'
+    profile_id: '8192'
+  man1:
+    user_name: 'man1'
+    rep_id: '100012345'
+    profile_id: '8100'
+rep:
+  hhummer:
+    user_name: 'hhummer'
+    rep_id: '100428682'
+    profile_id: '8064'
+  man3:
+    user_name: 'man3'
+    rep_id: '100976252'
+    profile_id: '8238'

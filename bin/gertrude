@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require "gertrude"
+require "pry"
+
+command = ARGV[0]
+
+if command.eql? "start"
+  ItemServer.run!
+end
