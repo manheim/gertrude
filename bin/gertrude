@@ -31,6 +31,16 @@ end.parse!
 
 require "gertrude"
 
-if ARGV[0].eql? "start"
-   ItemServer.run!(options)
+command = ARGV[0].downcase
+
+if command.eql? "start"
+  ItemServer.run!(options)
+elsif command.eql? "restart"
+  #TODO kill the running server.
+  ItemServer.run!(options)
+elsif command.eql? "stop"
+  #TODO kill the running server.
+else
+  raise "Command #{ARGV[0]} is not valid. Please use 'start', 'stop', or 'restart'."
 end
+
