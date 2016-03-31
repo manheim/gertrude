@@ -33,12 +33,16 @@ require "gertrude"
 
 command = ARGV[0].downcase
 
-if command.eql? "start"
+#TODO Fix me. These things need to happen
+if command.eql? 'start'
+  #TODO raise error is there isn't a file provided
   ItemServer.run!(options)
-elsif command.eql? "restart"
+elsif command.eql? 'restart'
+  #TODO raise error is there isn't a file provided
   #TODO kill the running server.
   ItemServer.run!(options)
-elsif command.eql? "stop"
+elsif command.eql? 'stop'
+  #TODO raise warn if a server isn't running
   #TODO kill the running server.
 else
   raise "Command #{ARGV[0]} is not valid. Please use 'start', 'stop', or 'restart'."
