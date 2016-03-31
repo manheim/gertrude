@@ -77,7 +77,7 @@ Start service, using created yaml file
 
 Start the service. In this example, we use rack:
 ```ruby
-$gertrude start path/to/yml
+$gertrude start -f path/to/yml
 ```
 
 Request items from the service
@@ -101,7 +101,7 @@ You can pass a timeout, in seconds (default is 50). Sometimes you have to wait f
 
 Get a list of all items that are currently reserved.
 ```ruby
-  http:/0.0.0.0:8080/get_reserved_items
+  http:/0.0.0.0:8080/reserved_items_list
 ```
 
 Use the requested items to your hearts content
