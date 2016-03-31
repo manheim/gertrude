@@ -8,7 +8,7 @@ describe "Items List" do
 
       it 'should add a unique key 2nd level to the given hash' do
         allow(YAML).to receive(:load_file).with('').and_return(hash)
-        expect(ItemsList.new.load_items!('')[:type][:test].keys).to include ItemsList::RESERVE_KEY
+        expect(ItemsList.new.load_items!('').items[:type][:test].keys).to include ItemsList::RESERVE_KEY
       end
 
       it 'should set @items to a hash' do

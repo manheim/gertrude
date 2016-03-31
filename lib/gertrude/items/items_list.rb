@@ -14,6 +14,7 @@ class ItemsList
     end
     raise ItemError::ItemsNotUnique.new unless unique_keys_across_items?(config)
     @items = config
+    self
   end
 
   def unique_keys_across_items?(config)

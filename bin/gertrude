@@ -7,6 +7,10 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: example.rb [options]"
 
+  opts.on("-f", "--file [FILEPATH]", String, "Pass the yml file (Default is 0.0.0.0)") do |file|
+    options[:file] = file
+  end
+
   opts.on("-p", "--port [PORT]", Integer, "Assign server port (Default is 4567)") do |p|
     options[:port] = p
   end
@@ -25,8 +29,10 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+puts options
+
 require "gertrude"
 
 if ARGV[0].eql? "start"
-  ItemServer.run!(options)
+   ItemServer.run!(options)
 end

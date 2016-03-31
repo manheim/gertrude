@@ -1,7 +1,10 @@
 class ItemServer < Sinatra::Base
 
   items_list = ItemsList.new
-  ARGV[1].nil? ? (raise 'yml file required to start gertrude') : items_list.load_items!(ARGV[1])
+
+  before do
+    items_list.load_items!(settings.file) if items_list.items.nil?
+  end
 
   error ::ItemError::ItemTypeNotDefined do |type|
     error 422, "Item type not defined: #{type}"
@@ -37,5 +40,7 @@ class ItemServer < Sinatra::Base
   end
 
 end
+
+
 
 
