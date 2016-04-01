@@ -153,11 +153,10 @@ describe 'items list' do
       items = ItemsList.new
       expect { items.load_items!('') }.to raise_error ItemError::ItemsNotUnique
     end
+
+    it 'should raise an error on invalid config file' do
+      expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
+    end
   end
 
-    describe '#load_items!' do
-      it 'should raise an error on invalid config file' do
-        expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
-      end
-    end
 end
