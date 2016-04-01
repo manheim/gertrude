@@ -1,9 +1,8 @@
 class ItemServer < Sinatra::Base
 
-  items_list = ItemsList.new
-
-  before do
-    items_list.load_items!(settings.file) if items_list.items.nil?
+  def initialize
+    super
+    @items_list = ItemsList.new.load_items!(settings.file)
   end
 
   error ::ItemError::ItemTypeNotDefined do |type|
@@ -23,19 +22,19 @@ class ItemServer < Sinatra::Base
   end
 
   get '/reserve/item' do
-    items_list.get_item(params[:type], params[:timeout] || 50).to_json
+    @items_list.get_item(params[:type], params[:timeout] || 50).to_json
+  end
+
+  get '/reserved' do
+    @items_list.get_reserved_items.to_json
   end
 
   get '/release/item' do
-    (!items_list.release_item(params[:item])).to_json
+    (!@items_list.release_item(params[:item])).to_json
   end
 
-  get '/reserved_items_list' do
-    "Reserved Items: #{items_list.get_reserved_items}"
-  end
-
-  get '/release_all_items' do
-    "Items released: #{items_list.release_all_items}"
+  get '/release' do
+    @items_list.release_all_items.to_json
   end
 
 end
