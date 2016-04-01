@@ -17,14 +17,20 @@ describe('item server') do
 
   it('should release all items') do
     allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return("All Items Released.")
-    get '/release_all_items'
-    expect(last_response.body).to eql 'Items released: All Items Released.'
+    get '/release'
+    expect(last_response.body).to eql 'All Items Released.'
   end
 
   it('should return a list of reserved items') do
     allow_any_instance_of(ItemsList).to receive(:get_reserved_items).and_return('danny7')
-    get '/reserved_items_list'
-    expect(last_response.body).to eql 'Reserved Items: danny7'
+    get '/reserved'
+    expect(last_response.body).to eql 'danny7'
+  end
+
+  it('should return a list of available items') do
+    allow_any_instance_of(ItemsList).to receive(:get_available_items).and_return('johnny5')
+    get '/available'
+    expect(last_response.body).to eql 'johnny5'
   end
 
   it('should return Item Type Not Defined error if item type does not exist') do
@@ -43,7 +49,7 @@ describe('item server') do
 
   it('should return No Reserved Items error if no items in reserved list') do
     allow_any_instance_of(ItemsList).to receive(:get_reserved_items).and_raise(ItemError::NoReservedItems)
-    get '/reserved_items_list'
+    get '/reserved'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'No items currently reserved'
   end
@@ -57,7 +63,7 @@ describe('item server') do
 
   it('should raise No Reserved Items error if no items reserved') do
     allow_any_instance_of(ItemsList).to receive(:release_all_items).and_raise(ItemError::NoReservedItems)
-    get '/release_all_items'
+    get '/release'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'No items currently reserved'
   end

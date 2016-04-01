@@ -55,6 +55,21 @@ describe 'items list' do
     end
   end
 
+  describe '#get_available_items' do
+    it 'should return a string of reserved items' do
+      allow(item_list).to receive(:available_items).and_return(%w(danny7))
+      expect(item_list.get_available_items).to eql 'danny7'
+    end
+  end
+
+  describe '#get_all_items' do
+    it 'should return a string of reserved items' do
+      allow(item_list).to receive(:all_items).and_return(item_list.items)
+      response_hash = {"admin"=>{"danny7"=>{"danny7"=>{"user_name"=>"danny9", "rep_id"=>"100014620", "profile_id"=>"8190"}}, "johnny5"=>{"johnny5"=>{"user_name"=>"danny7", "rep_id"=>"100014624", "profile_id"=>"8192"}}}}
+      expect(item_list.get_all_items).to eql response_hash
+    end
+  end
+
   describe '#release_all_items' do
     it 'should release all items' do
       allow(item_list).to receive(:reserved_items).and_return(['danny7'])
@@ -79,6 +94,13 @@ describe 'items list' do
     it 'should return an array of reserved items' do
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
       expect(item_list.reserved_items).to eql ['danny7']
+    end
+  end
+
+  describe '#available_items' do
+    it 'should return an array of available items' do
+      item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
+      expect(item_list.available_items).to eql ['johnny5']
     end
   end
 
