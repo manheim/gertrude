@@ -64,7 +64,7 @@ custom_user:
 
 Alternately, you can replace the "all_items.yml" file in the repo with your yaml file, and then start the service.
 
-Clone the repo
+Install the Gem
 --------------
 
 Install the gem
