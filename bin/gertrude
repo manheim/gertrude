@@ -1,18 +1,24 @@
 #!/usr/bin/env ruby
 
-require "optparse"
+require 'bundler/setup'
+require 'optparse'
+require 'yaml'
 
 options = {}
 
 OptionParser.new do |opts|
   opts.banner = "Usage: example.rb [options]"
 
-  opts.on("-f", "--file [FILEPATH]", String, "Pass the yml file (Default is 0.0.0.0)") do |file|
+  opts.on("-f", "--file [FILEPATH]", String, "Pass the yml file.") do |file|
     options[:file] = file
   end
 
   opts.on("-p", "--port [PORT]", Integer, "Assign server port (Default is 4567)") do |p|
     options[:port] = p
+  end
+
+  opts.on("-d", "--daemonize", "Run the server in the background") do |d|
+    options[:daemonize] = d
   end
 
   opts.on("-e", "--environment [ENV]", String, "Set Sinatra environment (Default is development)") do |env|
@@ -29,22 +35,33 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-require "gertrude"
+options[:port] = 4567 if options[:port].nil?
+options[:environment] = 'development' if options[:environment].nil?
+options[:host] = '0.0.0.0' if options[:host].nil?
 
-command = ARGV[0].downcase
+require 'gertrude'
+require 'webrick'
 
-#TODO Fix me. These things need to happen
-if command.eql? 'start'
-  #TODO raise error is there isn't a file provided
-  ItemServer.run!(options)
-elsif command.eql? 'restart'
-  #TODO raise error is there isn't a file provided
-  #TODO kill the running server.
-  ItemServer.run!(options)
-elsif command.eql? 'stop'
-  #TODO raise warn if a server isn't running
-  #TODO kill the running server.
-else
-  raise "Command #{ARGV[0]} is not valid. Please use 'start', 'stop', or 'restart'."
+config_file = "#{Dir.pwd}/config.yml"
+
+case ARGV[0].downcase
+  when 'start'
+    fail "File is a required parameter" if options[:file].nil?
+    options[:file] = File.expand_path(options[:file])
+    if options[:daemonize]
+      File.write(config_file, options.to_yaml)
+      WEBrick::Daemon.start
+    end
+    ItemServer.run!(options)
+  when 'stop'
+    config = YAML.load_file(config_file)
+    port = config[:port]
+    fail "Port not found in config file.  You'll need to manually kill the server." if config[:port].nil?
+    `kill $(lsof -t -i :#{port})`
+    `rm #{config_file}` if File.exists?(config_file)
+  else
+    fail "Start and stop are the only two options."
 end
+
+
 
