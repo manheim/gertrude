@@ -92,7 +92,7 @@ See all available items, and their properties.
 
 Get a list of all items available for reservation
 ```ruby
-  http:/0.0.0.0:8080/available
+  http://0.0.0.0:8080/available
 ```
 
 Reserve an item.
