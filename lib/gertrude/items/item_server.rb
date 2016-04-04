@@ -21,22 +21,29 @@ class ItemServer < Sinatra::Base
     halt 422, "No #{type} items available to reserve"
   end
 
-  get '/reserve/item' do
-    @items_list.get_item(params[:type], params[:timeout] || 50).to_json
+  get '/' do
+    @items_list.all_items.to_json
   end
 
-  get '/reserved' do
-    @items_list.get_reserved_items.to_json
+  get '/reserve/item' do
+    @items_list.get_item(params[:type], params[:timeout] || 50).to_json
   end
 
   get '/release/item' do
     (!@items_list.release_item(params[:item])).to_json
   end
 
-  get '/release' do
-    @items_list.release_all_items.to_json
+  get '/reserved' do
+    @items_list.get_reserved_items.to_json
   end
 
+  get '/release' do
+    @items_list.release_all_items
+  end
+
+  get '/available' do
+    @items_list.get_available_items
+  end
 end
 
 
