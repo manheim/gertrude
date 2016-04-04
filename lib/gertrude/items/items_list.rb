@@ -38,20 +38,6 @@ class ItemsList
     reserved_items.join(", ")
   end
 
-  def get_available_items
-    available_items.join(",")
-  end
-
-  def get_all_items
-    list = Marshal.load(Marshal.dump(@items))
-    list.each_key do |type|
-      list[type].each do |item|
-        list[type][item[0]] = sanitize_response({item[0] => item[1]})
-      end
-    end
-    list
-  end
-
   def release_all_items
     raise ItemError::NoReservedItems if reserved_items.empty?
     @items.each_key do |type|
@@ -60,16 +46,6 @@ class ItemsList
       end
     end
     "All Items Released."
-  end
-
-  def available_items
-    available_items = []
-    @items.each_key do |type|
-      @items[type].each_key do |item|
-        available_items << item unless @items[type][item][RESERVE_KEY]
-      end
-    end
-    available_items
   end
 
   def reserved_items
