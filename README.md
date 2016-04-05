@@ -105,7 +105,7 @@ Gertrude will return you the requested item as a hash.
  {'admin1' => {'password' => 'admin_password_1', 'other' => 'admin_other'}
 ```
 
-You can pass a timeout, in seconds (default is 50). Sometimes you have to wait for an item to become available.
+You can pass a timeout, in seconds (default is 30). Sometimes you have to wait for an item to become available.
 ```ruby
   http://0.0.0.0:8080/reserve/item?type=admin&timeout=120
 ```

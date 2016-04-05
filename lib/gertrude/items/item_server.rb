@@ -26,7 +26,7 @@ class ItemServer < Sinatra::Base
   end
 
   get '/reserve/item' do
-    @items_list.get_item(params[:type], params[:timeout] || 50).to_json
+    @items_list.get_item(params[:type], params[:timeout] || 30).to_json
   end
 
   get '/release/item' do
