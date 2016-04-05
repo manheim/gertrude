@@ -22,7 +22,7 @@ class ItemServer < Sinatra::Base
   end
 
   get '/' do
-    @items_list.all_items.to_json
+    @items_list.get_all_items.to_json
   end
 
   get '/reserve/item' do
@@ -38,11 +38,11 @@ class ItemServer < Sinatra::Base
   end
 
   get '/release' do
-    @items_list.release_all_items
+    @items_list.release_all_items.to_json
   end
 
   get '/available' do
-    @items_list.get_available_items
+    @items_list.get_available_items.to_json
   end
 end
 

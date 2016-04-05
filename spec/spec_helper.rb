@@ -14,9 +14,9 @@ require_relative '../lib/gertrude/items/items_list'
 require_relative '../lib/gertrude/items/item_server'
 
 def app
-  svr = ItemServer.new
+  svr = ItemServer
   svr.settings.set(:file,  "#{$project_root}/spec/test_items_spec.yml")
-  svr.settings.environment = :production
+  svr.set :environment, :production
   svr
 end
 
