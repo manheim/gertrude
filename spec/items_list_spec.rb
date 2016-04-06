@@ -65,7 +65,7 @@ describe 'items list' do
   describe '#get_all_items' do
     it 'should return a string of reserved items' do
       allow(item_list).to receive(:all_items).and_return(item_list.items)
-      response_hash = {"admin"=>{"danny7"=>{"danny7"=>{"user_name"=>"danny9", "rep_id"=>"100014620", "profile_id"=>"8190"}}, "johnny5"=>{"johnny5"=>{"user_name"=>"danny7", "rep_id"=>"100014624", "profile_id"=>"8192"}}}}
+      response_hash = {"admin" => {"danny7" => {"danny7" => {"user_name" => "danny9", "rep_id" => "100014620", "profile_id" => "8190"}}, "johnny5" => {"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192"}}}}
       expect(item_list.get_all_items).to eql response_hash
     end
   end
@@ -168,6 +168,13 @@ describe 'items list' do
       items = ItemsList.new
       items.load_items!('')
       expect(items.instance_variable_get('@items')).to be_a_kind_of Hash
+    end
+
+    it 'should set @items to provided hash' do
+      allow(YAML).to receive(:load_file).with('').and_return(hash)
+      items = ItemsList.new
+      items.load_items!('')
+      expect(items.instance_variable_get('@items')).to eql hash
     end
 
     it 'should raise an error if duplicate keys' do
