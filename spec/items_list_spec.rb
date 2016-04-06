@@ -80,11 +80,6 @@ describe 'items list' do
       expect(item_list.items['admin']['johnny5'][ItemsList::RESERVE_KEY]).to be false
     end
 
-    it 'should return message that all items are released' do
-      item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
-      expect(item_list.release_all_items).to eql 'All Items Released.'
-    end
-
     it('should raise No Reserved Items if no items are reserved') do
       expect { item_list.release_all_items }.to raise_error(ItemError::NoReservedItems)
     end

@@ -38,7 +38,8 @@ class ItemServer < Sinatra::Base
   end
 
   get '/release' do
-    @items_list.release_all_items.to_json
+    @items_list.release_all_items
+    status 204
   end
 
   get '/available' do

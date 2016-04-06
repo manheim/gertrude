@@ -19,7 +19,7 @@ describe('item server') do
   it('should release all items') do
     allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return("All Items Released.")
     get '/release'
-    expect(last_response.body).to eql "\"All Items Released.\""
+    expect(last_response.status).to eql 204
   end
 
   it('should return a list of reserved items') do

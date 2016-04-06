@@ -59,7 +59,6 @@ class ItemsList
         @items[type][item][RESERVE_KEY] = false if @items[type][item][RESERVE_KEY]
       end
     end
-    "All Items Released."
   end
 
   def available_items
