@@ -163,13 +163,6 @@ describe 'items list' do
       expect(ItemsList.new.load_items!('').items[:type][:test].keys).to include ItemsList::RESERVE_KEY
     end
 
-    it 'should set @items to a hash' do
-      allow(YAML).to receive(:load_file).with('').and_return(hash)
-      items = ItemsList.new
-      items.load_items!('')
-      expect(items.instance_variable_get('@items')).to be_a_kind_of Hash
-    end
-
     it 'should set @items to provided hash' do
       allow(YAML).to receive(:load_file).with('').and_return(hash)
       items = ItemsList.new
