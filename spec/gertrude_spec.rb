@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 describe('item server') do
-  let (:item) { {'danny7'=> {'user_name' => 'danny9', 'rep_id' => '100014624', 'profile_id' => '8192'}} }
+  let (:item) { {'danny7' => {'user_name' => 'danny9', 'rep_id' => '100014624', 'profile_id' => '8192'}} }
+  let (:hash) { {type: {test: {hello: 'world', foo: 'bar'}, basic: {basic1: {}, basic2: {}}}} }
 
   it('should reserve an item') do
     allow_any_instance_of(ItemsList).to receive(:get_item).with('admin', 30).and_return(item)
@@ -66,5 +67,11 @@ describe('item server') do
     get '/release'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'No items currently reserved'
+  end
+
+  it('should return all items') do
+    allow_any_instance_of(ItemsList).to receive(:get_all_items).and_return(hash)
+    get '/'
+    expect(last_response.body).to eql hash.to_json
   end
 end
