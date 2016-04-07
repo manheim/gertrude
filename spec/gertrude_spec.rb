@@ -17,9 +17,15 @@ describe('item server') do
   end
 
   it('should release all items') do
-    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return("All Items Released.")
+    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return(true)
     get '/release'
     expect(last_response.status).to eql 204
+  end
+
+  it('should return 500 error if release all items fails') do
+    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_raise(ArgumentError)
+    get '/release'
+    expect(last_response.status).to eql 500
   end
 
   it('should return a list of reserved items') do

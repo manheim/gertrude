@@ -59,6 +59,7 @@ class ItemsList
         @items[type][item][RESERVE_KEY] = false if @items[type][item][RESERVE_KEY]
       end
     end
+    true
   end
 
   def available_items
