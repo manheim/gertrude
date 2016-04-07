@@ -55,6 +55,21 @@ describe 'items list' do
     end
   end
 
+  describe '#get_available_items' do
+    it 'should return a string of reserved items' do
+      allow(item_list).to receive(:available_items).and_return(%w(danny7))
+      expect(item_list.get_available_items).to eql 'danny7'
+    end
+  end
+
+  describe '#get_all_items' do
+    it 'should return a string of reserved items' do
+      allow(item_list).to receive(:all_items).and_return(item_list.items)
+      response_hash = {"admin" => {"danny7" => {"danny7" => {"user_name" => "danny9", "rep_id" => "100014620", "profile_id" => "8190"}}, "johnny5" => {"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192"}}}}
+      expect(item_list.get_all_items).to eql response_hash
+    end
+  end
+
   describe '#release_all_items' do
     it 'should release all items' do
       allow(item_list).to receive(:reserved_items).and_return(['danny7'])
@@ -65,9 +80,11 @@ describe 'items list' do
       expect(item_list.items['admin']['johnny5'][ItemsList::RESERVE_KEY]).to be false
     end
 
-    it 'should return message that all items are released' do
+    it('should return true') do
+      allow(item_list).to receive(:reserved_items).and_return(['danny7'])
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
-      expect(item_list.release_all_items).to eql 'All Items Released.'
+      item_list.items['admin']['johnny5'][ItemsList::RESERVE_KEY] = true
+      expect(item_list.release_all_items).to be true
     end
 
     it('should raise No Reserved Items if no items are reserved') do
@@ -79,6 +96,13 @@ describe 'items list' do
     it 'should return an array of reserved items' do
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
       expect(item_list.reserved_items).to eql ['danny7']
+    end
+  end
+
+  describe '#available_items' do
+    it 'should return an array of available items' do
+      item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
+      expect(item_list.available_items).to eql ['johnny5']
     end
   end
 
@@ -131,4 +155,32 @@ describe 'items list' do
       expect(item_list.get_available_item('admin')).to eql({"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192", ItemsList::RESERVE_KEY.to_sym => false}})
     end
   end
+
+  describe '#load_items!' do
+    let(:hash) { {type: {test: {hello: 'world', foo: 'bar'}, basic: {basic1: {}, basic2: {}}}} }
+    let(:duplicate_hash) { {type: {test: {hello: 'world', foo: 'bar'}}, type2: {test: {hello: 'world'}}} }
+
+    it 'should add a unique key 2nd level to the given hash' do
+      allow(YAML).to receive(:load_file).with('').and_return(hash)
+      expect(ItemsList.new.load_items!('').items[:type][:test].keys).to include ItemsList::RESERVE_KEY
+    end
+
+    it 'should set @items to provided hash' do
+      allow(YAML).to receive(:load_file).with('').and_return(hash)
+      items = ItemsList.new
+      items.load_items!('')
+      expect(items.instance_variable_get('@items')).to eql hash
+    end
+
+    it 'should raise an error if duplicate keys' do
+      allow(YAML).to receive(:load_file).with('').and_return(duplicate_hash)
+      items = ItemsList.new
+      expect { items.load_items!('') }.to raise_error ItemError::ItemsNotUnique
+    end
+
+    it 'should raise an error on invalid config file' do
+      expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
+    end
+  end
+
 end

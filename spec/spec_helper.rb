@@ -14,10 +14,10 @@ require_relative '../lib/gertrude/items/items_list'
 require_relative '../lib/gertrude/items/item_server'
 
 def app
-  svr = ItemServer.new
-  svr.settings.set(:file,  "#{$project_root}/spec/test_items_spec.yml")
-  svr.settings.environment = :production
-  svr
+  ItemServer.tap do |svr|
+    svr.settings.set(:file,  "#{$project_root}/spec/test_items_spec.yml")
+    svr.set :environment, :production
+  end
 end
 
 RSpec.configure do |config|

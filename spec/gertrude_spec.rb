@@ -1,10 +1,11 @@
 require 'spec_helper'
 
 describe('item server') do
-  let (:item) { {'danny7'=> {'user_name' => 'danny9', 'rep_id' => '100014624', 'profile_id' => '8192'}} }
+  let (:item) { {'danny7' => {'user_name' => 'danny9', 'rep_id' => '100014624', 'profile_id' => '8192'}} }
+  let (:hash) { {type: {test: {hello: 'world', foo: 'bar'}, basic: {basic1: {}, basic2: {}}}} }
 
   it('should reserve an item') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('admin', 50).and_return(item)
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('admin', 30).and_return(item)
     get '/reserve/item?type=admin'
     expect(last_response.body).to eql item.to_json
   end
@@ -16,26 +17,38 @@ describe('item server') do
   end
 
   it('should release all items') do
-    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return("All Items Released.")
-    get '/release_all_items'
-    expect(last_response.body).to eql 'Items released: All Items Released.'
+    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_return(true)
+    get '/release'
+    expect(last_response.status).to eql 204
+  end
+
+  it('should return 500 error if release all items fails') do
+    allow_any_instance_of(ItemsList).to receive(:release_all_items).and_raise(ArgumentError)
+    get '/release'
+    expect(last_response.status).to eql 500
   end
 
   it('should return a list of reserved items') do
     allow_any_instance_of(ItemsList).to receive(:get_reserved_items).and_return('danny7')
-    get '/reserved_items_list'
-    expect(last_response.body).to eql 'Reserved Items: danny7'
+    get '/reserved'
+    expect(last_response.body).to eql "\"danny7\""
+  end
+
+  it('should return a list of available items') do
+    allow_any_instance_of(ItemsList).to receive(:get_available_items).and_return('johnny5')
+    get '/available'
+    expect(last_response.body).to eql "\"johnny5\""
   end
 
   it('should return Item Type Not Defined error if item type does not exist') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 50).and_raise(ItemError::ItemTypeNotDefined.new('foo'))
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30).and_raise(ItemError::ItemTypeNotDefined.new('foo'))
     get '/reserve/item?type=foo'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'Item type not defined: foo'
   end
 
   it('should return No Available Items error if item type does not exist') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 50).and_raise(ItemError::NoAvailableItems.new('foo'))
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30).and_raise(ItemError::NoAvailableItems.new('foo'))
     get '/reserve/item?type=foo'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql "No foo items available to reserve"
@@ -43,7 +56,7 @@ describe('item server') do
 
   it('should return No Reserved Items error if no items in reserved list') do
     allow_any_instance_of(ItemsList).to receive(:get_reserved_items).and_raise(ItemError::NoReservedItems)
-    get '/reserved_items_list'
+    get '/reserved'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'No items currently reserved'
   end
@@ -57,8 +70,14 @@ describe('item server') do
 
   it('should raise No Reserved Items error if no items reserved') do
     allow_any_instance_of(ItemsList).to receive(:release_all_items).and_raise(ItemError::NoReservedItems)
-    get '/release_all_items'
+    get '/release'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'No items currently reserved'
+  end
+
+  it('should return all items') do
+    allow_any_instance_of(ItemsList).to receive(:get_all_items).and_return(hash)
+    get '/'
+    expect(last_response.body).to eql hash.to_json
   end
 end

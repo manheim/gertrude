@@ -85,6 +85,16 @@ Request items from the service
 
 Routes are as follows (please replace with your host address, item type, and port)
 
+See all available items, and their properties.
+```ruby
+  http://0.0.0.0:8080/
+```
+
+Get a list of all items available for reservation
+```ruby
+  http://0.0.0.0:8080/available
+```
+
 Reserve an item.
 ```ruby
   http:/0.0.0.0:8080/reserve/item?type=admin
@@ -94,14 +104,15 @@ Gertrude will return you the requested item as a hash.
 ```ruby
  {'admin1' => {'password' => 'admin_password_1', 'other' => 'admin_other'}
 ```
-You can pass a timeout, in seconds (default is 50). Sometimes you have to wait for an item to become available.
+
+You can pass a timeout, in seconds (default is 30). Sometimes you have to wait for an item to become available.
 ```ruby
-  http:/0.0.0.0:8080/reserve/item?type=admin&timeout=120
+  http://0.0.0.0:8080/reserve/item?type=admin&timeout=120
 ```
 
 Get a list of all items that are currently reserved.
 ```ruby
-  http:/0.0.0.0:8080/reserved_items_list
+  http://0.0.0.0:8080/reserved
 ```
 
 Use the requested items to your hearts content
@@ -114,10 +125,10 @@ Release the item back to the service when you are done
 
 Release an item back to the service. You can't keep it forever.
 ```ruby
-  http:/0.0.0.0:8080/release/item?item=admin1
+  http://0.0.0.0:8080/release/item?item=admin1
 ```
 
 Release all currently reserved items.
 ```ruby
-  http:/0.0.0.0:8080/release_all_items
+  http://0.0.0.0:8080/release
 ```
