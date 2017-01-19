@@ -161,11 +161,12 @@ describe 'items list' do
 
   describe '#load_items!' do
     let(:hash) { {type: {test: {hello: 'world', foo: 'bar'}, basic: {basic1: {}, basic2: {}}}} }
+    let(:numeric_hash) { {numeric: {12345 => {hello: 'world', foo: 'bar'}, 967979 => {basic1: {}, basic2: {}}}} }
     let(:duplicate_hash) { {type: {test: {hello: 'world', foo: 'bar'}}, type2: {test: {hello: 'world'}}} }
 
     it 'should add a unique key 2nd level to the given hash' do
       allow(YAML).to receive(:load_file).with('').and_return(hash)
-      expect(ItemsList.new.load_items!('').items[:type][:test].keys).to include ItemsList::RESERVE_KEY
+      expect(ItemsList.new.load_items!('').items["type"]["test"].keys).to include ItemsList::RESERVE_KEY.to_s
     end
 
     it 'should set @items to provided hash' do
@@ -183,6 +184,11 @@ describe 'items list' do
 
     it 'should raise an error on invalid config file' do
       expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
+    end
+
+    it 'should convert keys to strings' do
+      allow(YAML).to receive(:load_file).with('').and_return(numeric_hash)
+      expect(ItemsList.new.load_items!('').items["numeric"].keys).to include(*["12345", "967979"])
     end
   end
 
