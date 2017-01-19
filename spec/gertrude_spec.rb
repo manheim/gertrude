@@ -5,7 +5,7 @@ describe('item server') do
   let (:hash) { {type: {test: {hello: 'world', foo: 'bar'}, basic: {basic1: {}, basic2: {}}}} }
 
   it('should reserve an item') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('admin', 30).and_return(item)
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('admin', 30, 180).and_return(item)
     get '/reserve/item?type=admin'
     expect(last_response.body).to eql item.to_json
   end
@@ -41,14 +41,14 @@ describe('item server') do
   end
 
   it('should return Item Type Not Defined error if item type does not exist') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30).and_raise(ItemError::ItemTypeNotDefined.new('foo'))
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30, 180).and_raise(ItemError::ItemTypeNotDefined.new('foo'))
     get '/reserve/item?type=foo'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql 'Item type not defined: foo'
   end
 
   it('should return No Available Items error if item type does not exist') do
-    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30).and_raise(ItemError::NoAvailableItems.new('foo'))
+    allow_any_instance_of(ItemsList).to receive(:get_item).with('foo', 30, 180).and_raise(ItemError::NoAvailableItems.new('foo'))
     get '/reserve/item?type=foo'
     expect(last_response.status).to eql 422
     expect(last_response.body).to eql "No foo items available to reserve"

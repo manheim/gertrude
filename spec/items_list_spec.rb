@@ -12,7 +12,7 @@ describe 'items list' do
 
   describe '#unique_keys_across_items' do
     it 'should raise Item Type Not Defined' do
-      expect { item_list.get_item(:blah, 1) }.to raise_error(ItemError::ItemTypeNotDefined)
+      expect { item_list.get_item(:blah, 1, 10) }.to raise_error(ItemError::ItemTypeNotDefined)
     end
 
     it 'should return true if unique keys' do
@@ -27,20 +27,21 @@ describe 'items list' do
 
   describe '#get_item' do
     it 'should raise an error if type not defined' do
-      expect { item_list.get_item('foo', 0.01) }.to raise_error ItemError::ItemTypeNotDefined
+      expect { item_list.get_item('foo', 0.01, 3) }.to raise_error ItemError::ItemTypeNotDefined
     end
 
     it 'should return an item' do
-      allow(item_list).to receive(:loop_for_item).with('admin', 0.01).and_return(item)
-      expect(item_list.get_item('admin', 0.01)).to eql item
+      allow(item_list).to receive(:loop_for_item).with('admin', 0.01, 3).and_return(item)
+      expect(item_list.get_item('admin', 0.01, 3)).to eql item
     end
   end
 
   describe '#release_item' do
     it 'should release an item' do
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
-      expect(item_list.release_item('danny7')).to be false
+      expect(item_list.release_item('danny7')).to be nil
       expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be false
+      expect(item_list.items['admin']['danny7']).to_not have_key :reserved_time
     end
 
     it('should raise Invalid Item error when trying to release non reserved item') do
@@ -78,6 +79,8 @@ describe 'items list' do
       item_list.release_all_items
       expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be false
       expect(item_list.items['admin']['johnny5'][ItemsList::RESERVE_KEY]).to be false
+      expect(item_list.items['admin']['danny7']).to_not have_key :reserved_time
+      expect(item_list.items['admin']['johnny5']).to_not have_key :reserved_time
     end
 
     it('should return true') do
@@ -109,29 +112,29 @@ describe 'items list' do
   describe '#loop_for_item' do
     it 'should reserve an item' do
       allow(item_list).to receive(:get_available_item).with('admin').and_return(item)
-      allow(item_list).to receive(:reserve_item).with('admin', 'danny7').and_return(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true)
+      allow(item_list).to receive(:reserve_item).with('admin', 'danny7', 3).and_return(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true)
       allow(item_list).to receive(:sanitize_response).with(item)
-      item_list.loop_for_item('admin', 0.01)
+      item_list.loop_for_item('admin', 0.01, 3)
       expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be true
     end
 
     it 'should return a sanitized response' do
       allow(item_list).to receive(:get_available_item).with('admin').and_return(item)
-      allow(item_list).to receive(:reserve_item).with('admin', 'danny7')
+      allow(item_list).to receive(:reserve_item).with('admin', 'danny7', 3)
       allow(item_list).to receive(:sanitize_response).with(item).and_return(item)
-      expect(item_list.loop_for_item('admin', 0.01)['danny7'].keys).to_not include ItemsList::RESERVE_KEY
+      expect(item_list.loop_for_item('admin', 0.01, 3)['danny7'].keys).to_not include ItemsList::RESERVE_KEY
     end
 
     it 'should return a hash' do
       allow(item_list).to receive(:get_available_item).with('admin').and_return(item)
-      allow(item_list).to receive(:reserve_item).with('admin', 'danny7')
+      allow(item_list).to receive(:reserve_item).with('admin', 'danny7', 3)
       allow(item_list).to receive(:sanitize_response).with(item).and_return(item)
-      expect(item_list.loop_for_item('admin', 0.01)).to be_a_kind_of Hash
+      expect(item_list.loop_for_item('admin', 0.01, 3)).to be_a_kind_of Hash
     end
 
     it 'should raise a timeout error if not items available' do
       allow(item_list).to receive(:get_available_item).with('admin').and_return([])
-      expect { item_list.loop_for_item('admin', 0.01) }.to raise_error ItemError::NoAvailableItems
+      expect { item_list.loop_for_item('admin', 0.01, 3) }.to raise_error ItemError::NoAvailableItems
     end
   end
 
@@ -144,7 +147,7 @@ describe 'items list' do
 
   describe '#reserve_item' do
     it 'should reserve an item' do
-      expect(item_list.reserve_item('admin', 'danny7')).to be true
+      expect(item_list.reserve_item('admin', 'danny7', 3)).to be true
       expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be true
     end
   end
@@ -181,6 +184,25 @@ describe 'items list' do
     it 'should raise an error on invalid config file' do
       expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
     end
+  end
+
+  describe '#clear_expire_reservations' do
+    it 'should clear expired reservations' do
+      item_list.items['admin']['danny7'][:reserved_time] = Time.now - 10
+      item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
+      item_list.clear_expired_reservations
+      expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be false
+      expect(item_list.items['admin']['danny7']).to_not have_key :reserved_time
+    end
+
+    it 'should not clear active reservations' do
+      item_list.items['admin']['danny7'][:reserved_time] = Time.now + 180
+      item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
+      item_list.clear_expired_reservations
+      expect(item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY]).to be true
+      expect(item_list.items['admin']['danny7']).to have_key :reserved_time
+    end
+
   end
 
 end

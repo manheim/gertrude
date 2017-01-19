@@ -24,14 +24,15 @@ class ItemsList
     item_keys.count == item_keys.uniq.count
   end
 
-  def get_item(type, timeout)
+  def get_item(type, timeout, expiration)
     raise ItemError::ItemTypeNotDefined.new(type) unless @items.has_key? type
-    loop_for_item(type, timeout)
+    loop_for_item(type, timeout, expiration)
   end
 
   def release_item(item)
     raise ItemError::InvalidItem.new(item) unless @items.has_deep_key?(item)
     @items.deep_find(item)[RESERVE_KEY] = false
+    @items.deep_find(item).delete(:reserved_time)
   end
 
   def get_reserved_items
@@ -57,6 +58,7 @@ class ItemsList
     @items.each_key do |type|
       @items[type].each_key do |item|
         @items[type][item][RESERVE_KEY] = false if @items[type][item][RESERVE_KEY]
+        @items[type][item].delete(:reserved_time) if @items[type][item][:reserved_time]
       end
     end
     true
@@ -82,13 +84,14 @@ class ItemsList
     taken_items
   end
 
-  def loop_for_item(type, timeout)
+  def loop_for_item(type, timeout, expiration)
+    clear_expired_reservations
     item = wait_until(timeout: timeout) do
       item = get_available_item(type)
       raise ItemError::NoAvailableItems if item.empty?
       item
     end
-    reserve_item(type, item.keys.first)
+    reserve_item(type, item.keys.first, expiration)
     sanitize_response(item)
   end
 
@@ -98,11 +101,22 @@ class ItemsList
     x
   end
 
-  def reserve_item(type, item_key)
+  def reserve_item(type, item_key, expiration)
+    @items[type][item_key][:reserved_time] = Time.now + expiration if expiration != 0
     @items[type][item_key][RESERVE_KEY] = true
   end
 
   def get_available_item(type)
     Hash[*@items[type].select { |item| !@items[type][item][RESERVE_KEY] }.first]
+  end
+
+  def clear_expired_reservations
+    @items.each_key do |type|
+      @items[type].each_key do |item|
+        if @items[type][item].has_key? :reserved_time
+          release_item(item) if (@items[type][item][:reserved_time] < Time.now)
+        end
+      end
+    end
   end
 end
