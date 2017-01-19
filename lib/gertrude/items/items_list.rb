@@ -13,7 +13,7 @@ class ItemsList
       end
     end
     raise ItemError::ItemsNotUnique.new unless unique_keys_across_items?(config)
-    @items = config
+    @items = config.deep_stringify_keys!
     self
   end
 
