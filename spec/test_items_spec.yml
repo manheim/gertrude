@@ -17,3 +17,8 @@ rep:
     user_name: 'man3'
     rep_id: '100976252'
     profile_id: '8238'
+numeric:
+  1234567:
+    user_name: 'numeric'
+    rep_id: ''
+    profile_id: ''
