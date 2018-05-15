@@ -30,7 +30,8 @@ class ItemServer < Sinatra::Base
   end
 
   get '/release/item' do
-    (!@items_list.release_item(params[:item])).to_json
+    item = params[:item]
+    (!@items_list.release_item(item)).to_json
   end
 
   get '/reserved' do
