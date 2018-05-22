@@ -1,6 +1,5 @@
 require 'bundler'
 require 'sinatra'
-require 'pry'
 require 'test-helpers/all'
 require 'yaml'
 require 'json'
