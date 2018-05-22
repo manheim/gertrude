@@ -5,9 +5,19 @@ describe 'items list' do
   let(:item) { {'danny7' => {'user_name' => 'danny9', 'rep_id' => '100014624', 'profile_id' => '8192'}} }
 
   before(:each) do
-    item_list.items = {'admin' =>
-                           {'danny7' => {'user_name' => 'danny9', 'rep_id' => '100014620', 'profile_id' => '8190', ItemsList::RESERVE_KEY.to_sym => false},
-                            'johnny5' => {'user_name' => 'danny7', 'rep_id' => '100014624', 'profile_id' => '8192', ItemsList::RESERVE_KEY.to_sym => false}}}
+    item_list.items = {
+      'admin' => {
+        'danny7' => {
+          'user_name' => 'danny9', 'rep_id' => '100014620', 'profile_id' => '8190', ItemsList::RESERVE_KEY.to_sym => false
+        },
+        'johnny5' => {
+          'user_name' => 'danny7', 'rep_id' => '100014624', 'profile_id' => '8192', ItemsList::RESERVE_KEY.to_sym => false
+        },
+        '5015806226' => {
+          'user_name' => '5015806226', 'rep_id' => '100014698', 'profile_id' => '8193', ItemsList::RESERVE_KEY.to_sym => false
+        }
+      }
+    }
   end
 
   describe '#unique_keys_across_items' do
@@ -47,6 +57,12 @@ describe 'items list' do
     it('should raise Invalid Item error when trying to release non reserved item') do
       expect { item_list.release_item('foo') }.to raise_error(ItemError::InvalidItem)
     end
+
+    it('should release an item that is all numeric characters') do
+      item_list.items['admin']['5015806226'][ItemsList::RESERVE_KEY] = true
+      expect(item_list.release_item(5015806226)).to be nil
+      expect(item_list.items['admin']['5015806226'][ItemsList::RESERVE_KEY]).to be false
+    end
   end
 
   describe '#get_reserved_items' do
@@ -66,7 +82,7 @@ describe 'items list' do
   describe '#get_all_items' do
     it 'should return a string of reserved items' do
       allow(item_list).to receive(:all_items).and_return(item_list.items)
-      response_hash = {"admin" => {"danny7" => {"danny7" => {"user_name" => "danny9", "rep_id" => "100014620", "profile_id" => "8190"}}, "johnny5" => {"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192"}}}}
+      response_hash = {"admin" => {"danny7" => {"danny7" => {"user_name" => "danny9", "rep_id" => "100014620", "profile_id" => "8190"}}, "johnny5" => {"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192"}}, "5015806226" => {"5015806226" => {'user_name' => '5015806226', 'rep_id' => '100014698', 'profile_id' => '8193'}}}}
       expect(item_list.get_all_items).to eql response_hash
     end
   end
@@ -105,7 +121,7 @@ describe 'items list' do
   describe '#available_items' do
     it 'should return an array of available items' do
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
-      expect(item_list.available_items).to eql ['johnny5']
+      expect(item_list.available_items).to eql ['johnny5', '5015806226']
     end
   end
 
@@ -186,7 +202,7 @@ describe 'items list' do
       expect { ItemsList.new.load_items!('blah123') }.to raise_error(Errno::ENOENT)
     end
 
-    it 'should convert keys to strings' do
+    it 'should convert numeric keys to strings' do
       allow(YAML).to receive(:load_file).with('').and_return(numeric_hash)
       expect(ItemsList.new.load_items!('').items["numeric"].keys).to include(*["12345", "967979"])
     end

@@ -30,6 +30,7 @@ class ItemsList
   end
 
   def release_item(item)
+    item = item.to_s
     raise ItemError::InvalidItem.new(item) unless @items.has_deep_key?(item)
     @items.deep_find(item)[RESERVE_KEY] = false
     @items.deep_find(item).delete(:reserved_time)
