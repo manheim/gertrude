@@ -2,7 +2,7 @@ class ItemsList
   include TestHelpers::Wait
 
   attr_accessor :items
-  RESERVE_KEY = "reserved_#{SecureRandom.hex(4)}".to_sym
+  RESERVE_KEY = "reserved_#{SecureRandom.hex(4)}"
 
   def load_items!(yml)
     config = YAML.load_file(yml)

@@ -8,13 +8,13 @@ describe 'items list' do
     item_list.items = {
       'admin' => {
         'danny7' => {
-          'user_name' => 'danny9', 'rep_id' => '100014620', 'profile_id' => '8190', ItemsList::RESERVE_KEY.to_sym => false
+          'user_name' => 'danny9', 'rep_id' => '100014620', 'profile_id' => '8190', ItemsList::RESERVE_KEY => false
         },
         'johnny5' => {
-          'user_name' => 'danny7', 'rep_id' => '100014624', 'profile_id' => '8192', ItemsList::RESERVE_KEY.to_sym => false
+          'user_name' => 'danny7', 'rep_id' => '100014624', 'profile_id' => '8192', ItemsList::RESERVE_KEY => false
         },
         '5015806226' => {
-          'user_name' => '5015806226', 'rep_id' => '100014698', 'profile_id' => '8193', ItemsList::RESERVE_KEY.to_sym => false
+          'user_name' => '5015806226', 'rep_id' => '100014698', 'profile_id' => '8193', ItemsList::RESERVE_KEY => false
         }
       }
     }
@@ -171,7 +171,7 @@ describe 'items list' do
   describe '#get_available_item' do
     it 'should get next available item' do
       item_list.items['admin']['danny7'][ItemsList::RESERVE_KEY] = true
-      expect(item_list.get_available_item('admin')).to eql({"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192", ItemsList::RESERVE_KEY.to_sym => false}})
+      expect(item_list.get_available_item('admin')).to eql({"johnny5" => {"user_name" => "danny7", "rep_id" => "100014624", "profile_id" => "8192", ItemsList::RESERVE_KEY => false}})
     end
   end
 
